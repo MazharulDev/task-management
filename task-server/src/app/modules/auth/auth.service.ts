@@ -50,6 +50,18 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
     config.jwt.refresh_expires_in as string
   );
 
+  // Store refresh token in database
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 365); // 365 days
+
+  await prisma.refreshToken.create({
+    data: {
+      token: refreshToken,
+      userId,
+      expiresAt,
+    },
+  });
+
   return {
     accessToken,
     refreshToken,
@@ -101,6 +113,18 @@ const registerUser = async (
     config.jwt.refresh_expires_in as string
   );
 
+  // Store refresh token in database
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 365); // 365 days
+
+  await prisma.refreshToken.create({
+    data: {
+      token: refreshToken,
+      userId,
+      expiresAt,
+    },
+  });
+
   return {
     accessToken,
     refreshToken,
@@ -121,6 +145,27 @@ const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
 
   const { userId } = verifiedToken;
 
+  // Check if refresh token exists in database
+  const storedToken = await prisma.refreshToken.findUnique({
+    where: {
+      token,
+    },
+  });
+
+  if (!storedToken) {
+    throw new ApiError(httpStatus.FORBIDDEN, 'Refresh token not found');
+  }
+
+  // Check if token is expired
+  if (storedToken.expiresAt < new Date()) {
+    await prisma.refreshToken.delete({
+      where: {
+        id: storedToken.id,
+      },
+    });
+    throw new ApiError(httpStatus.FORBIDDEN, 'Refresh token expired');
+  }
+
   // Check if user exists
   const isUserExist = await prisma.user.findUnique({
     where: {
@@ -132,7 +177,7 @@ const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
     throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist');
   }
 
-  // Generate new token
+  // Generate new access token
   const newAccessToken = jwtHelpers.createToken(
     {
       userId: isUserExist.id,
@@ -142,13 +187,61 @@ const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
     config.jwt.expires_in as string
   );
 
+  // Generate new refresh token (rotating)
+  const newRefreshToken = jwtHelpers.createToken(
+    {
+      userId: isUserExist.id,
+      role: isUserExist.role,
+    },
+    config.jwt.refresh_secret as Secret,
+    config.jwt.refresh_expires_in as string
+  );
+
+  // Delete old refresh token
+  await prisma.refreshToken.delete({
+    where: {
+      id: storedToken.id,
+    },
+  });
+
+  // Store new refresh token
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 365); // 365 days
+
+  await prisma.refreshToken.create({
+    data: {
+      token: newRefreshToken,
+      userId,
+      expiresAt,
+    },
+  });
+
   return {
     accessToken: newAccessToken,
+    refreshToken: newRefreshToken,
   };
+};
+
+const logout = async (token: string): Promise<void> => {
+  // Find and delete the refresh token
+  const storedToken = await prisma.refreshToken.findUnique({
+    where: {
+      token,
+    },
+  });
+
+  if (storedToken) {
+    await prisma.refreshToken.delete({
+      where: {
+        id: storedToken.id,
+      },
+    });
+  }
 };
 
 export const AuthService = {
   loginUser,
   registerUser,
   refreshToken,
+  logout,
 };

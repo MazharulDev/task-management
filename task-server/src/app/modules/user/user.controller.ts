@@ -87,10 +87,26 @@ const deleteUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getProfile = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user?.userId;
+  const result = await UserService.getSingleUser(userId);
+
+  // Remove password from response
+  const { password, ...userWithoutPassword } = result as any;
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Profile fetched successfully',
+    data: userWithoutPassword,
+  });
+});
+
 export const UserController = {
   createUser,
   getAllUsers,
   getSingleUser,
   updateUser,
   deleteUser,
+  getProfile,
 };

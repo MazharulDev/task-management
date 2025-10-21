@@ -10,10 +10,20 @@ const auth =
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       //get authorization token
-      const token = req.headers.authorization;
+      const authHeader = req.headers.authorization;
+      if (!authHeader) {
+        throw new ApiError(httpStatus.UNAUTHORIZED, 'You are not authorized');
+      }
+      
+      // Extract token from Bearer format
+      const token = authHeader.startsWith('Bearer ')
+        ? authHeader.substring(7)
+        : authHeader;
+      
       if (!token) {
         throw new ApiError(httpStatus.UNAUTHORIZED, 'You are not authorized');
       }
+      
       // verify token
       let verifiedUser = null;
 

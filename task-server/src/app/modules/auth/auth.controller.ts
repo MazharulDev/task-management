@@ -52,19 +52,36 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
 
   const result = await AuthService.refreshToken(refreshToken);
 
-  // Set refresh token into cookie
+  // Set new refresh token into cookie
   const cookieOptions = {
     secure: config.env === 'production',
     httpOnly: true,
   };
 
-  res.cookie('refreshToken', refreshToken, cookieOptions);
+  res.cookie('refreshToken', result.refreshToken, cookieOptions);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Token refreshed successfully',
-    data: result,
+    data: { accessToken: result.accessToken },
+  });
+});
+
+const logout = catchAsync(async (req: Request, res: Response) => {
+  const { refreshToken } = req.cookies;
+
+  if (refreshToken) {
+    await AuthService.logout(refreshToken);
+  }
+
+  // Clear refresh token cookie
+  res.clearCookie('refreshToken');
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User logged out successfully',
   });
 });
 
@@ -72,4 +89,5 @@ export const AuthController = {
   loginUser,
   registerUser,
   refreshToken,
+  logout,
 };

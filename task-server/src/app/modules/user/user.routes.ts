@@ -8,6 +8,12 @@ import { UserValidation } from './user.validations';
 const router = express.Router();
 
 router.get(
+  '/profile',
+  auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  UserController.getProfile
+);
+
+router.get(
   '/',
   auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   UserController.getAllUsers
