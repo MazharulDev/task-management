@@ -3,6 +3,17 @@ import { useSocket } from '../context/SocketContext';
 import api from '../lib/api';
 import type { Task } from '../lib/types';
 
+// Define the error structure
+interface AxiosError {
+  response?: {
+    data?: {
+      message?: string;
+      errorMessages?: { message?: string }[];
+    };
+  };
+  message?: string;
+}
+
 interface CreateTaskModalProps {
   onClose: () => void;
   onTaskCreated: () => void;
@@ -42,8 +53,14 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
       onTaskCreated();
       onClose();
     } catch (err) {
-      const error = err as { response?: { data?: { message?: string } } };
-      setError(error.response?.data?.message || 'Failed to create task');
+      const axiosError = err as AxiosError;
+      const message =
+        axiosError.response?.data?.errorMessages?.[0]?.message ||
+        axiosError.response?.data?.message ||
+        axiosError.message ||
+        'Failed to create task';
+
+      setError(message);
     } finally {
       setLoading(false);
     }

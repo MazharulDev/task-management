@@ -4,6 +4,17 @@ import { useSocket } from '../context/SocketContext';
 import type { Task } from '../lib/types';
 import api from '../lib/api';
 
+// Define the error structure
+interface AxiosError {
+  response?: {
+    data?: {
+      message?: string;
+      errorMessages?: { message?: string }[];
+    };
+  };
+  message?: string;
+}
+
 interface EditTaskModalProps {
   task: Task;
   onClose: () => void;
@@ -66,8 +77,14 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
       onTaskUpdated();
       onClose();
     } catch (err) {
-      const error = err as { response?: { data?: { message?: string } } };
-      setError(error.response?.data?.message || 'Failed to update task');
+      const axiosError = err as AxiosError;
+      const message =
+        axiosError.response?.data?.errorMessages?.[0]?.message ||
+        axiosError.response?.data?.message ||
+        axiosError.message ||
+        'Failed to update task';
+
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -120,10 +137,10 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
         {error && (
           <div
             style={{
-              color: 'red',
+              color: 'white',
               marginBottom: '10px',
               padding: '10px',
-              backgroundColor: '#fee',
+              backgroundColor: '#dc3545',
               borderRadius: '4px',
             }}
           >

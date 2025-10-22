@@ -2,6 +2,17 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+// Define the error structure
+interface AxiosError {
+  response?: {
+    data?: {
+      message?: string;
+      errorMessages?: { message?: string }[];
+    };
+  };
+  message?: string;
+}
+
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,8 +30,14 @@ const Login: React.FC = () => {
       await login(email, password);
       navigate('/');
     } catch (err) {
-      const error = err as Error;
-      setError(error.message || 'Login failed');
+      const axiosError = err as AxiosError;
+      const message =
+        axiosError.response?.data?.errorMessages?.[0]?.message ||
+        axiosError.response?.data?.message ||
+        axiosError.message ||
+        'Login failed';
+
+      setError(message);
     } finally {
       setLoading(false);
     }

@@ -30,7 +30,13 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Only attempt token refresh for 401 errors that are NOT from login/register endpoints
+    // and only if we haven't already retried
+    if (error.response?.status === 401 && 
+        !originalRequest._retry && 
+        !originalRequest.url.includes('/auth/login') && 
+        !originalRequest.url.includes('/auth/register')) {
+      
       originalRequest._retry = true;
 
       try {

@@ -20,8 +20,14 @@ const Register: React.FC = () => {
       await register(name, email, password);
       navigate('/');
     } catch (err) {
-      const error = err as Error;
-      setError(error.message || 'Registration failed');
+      const axiosError = err as any;
+      const message =
+        axiosError.response?.data?.errorMessages?.[0]?.message ||
+        axiosError.response?.data?.message ||
+        axiosError.message ||
+        'Registration failed';
+
+      setError(message);
     } finally {
       setLoading(false);
     }

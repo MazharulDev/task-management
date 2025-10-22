@@ -6,6 +6,17 @@ import api from '../lib/api';
 import EditTaskModal from './EditTaskModal';
 import ConfirmModal from './ConfirmModal';
 
+// Define the error structure
+interface AxiosError {
+  response?: {
+    data?: {
+      message?: string;
+      errorMessages?: { message?: string }[];
+    };
+  };
+  message?: string;
+}
+
 interface TaskItemProps {
   task: Task;
   onTaskUpdated: () => void;
@@ -35,15 +46,14 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onTaskUpdated }) => {
       onTaskUpdated();
       setShowDeleteConfirm(false);
     } catch (error) {
-      console.error('Error deleting task:', error);
-      // Type assertion for Axios error
-      if (error && typeof error === 'object' && 'response' in error) {
-        const axiosError = error as { response?: { data?: { message?: string } } };
-        const errorMessage = axiosError.response?.data?.message || 'Failed to delete task';
-        setDeleteError(errorMessage);
-      } else {
-        setDeleteError('Failed to delete task');
-      }
+      const axiosError = error as AxiosError;
+      const message =
+        axiosError.response?.data?.errorMessages?.[0]?.message ||
+        axiosError.response?.data?.message ||
+        axiosError.message ||
+        'Failed to delete task';
+
+      setDeleteError(message);
       // Don't close the modal if there's an error
     } finally {
       setIsDeleting(false);
