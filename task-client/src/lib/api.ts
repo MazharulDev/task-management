@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://task-management-yxwa.onrender.com/api/v1';
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const api = axios.create({
-  baseURL: API_URL,
+  baseURL: `${API_URL}/api/v1`,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -35,7 +35,7 @@ api.interceptors.response.use(
 
       try {
         const response = await axios.post(
-          `${API_URL}/auth/refresh-token`,
+          `${API_URL}/api/v1/auth/refresh-token`,
           {},
           { withCredentials: true }
         );

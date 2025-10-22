@@ -21,7 +21,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   const [locks, setLocks] = useState<Map<string, TaskLock>>(new Map());
 
   useEffect(() => {
-    const newSocket = io('http://localhost:5000', {
+    const newSocket = io(import.meta.env.VITE_API_URL, {
       transports: ['websocket', 'polling'],
     });
 
