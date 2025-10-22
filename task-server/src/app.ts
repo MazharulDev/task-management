@@ -8,7 +8,14 @@ import cookieParser from 'cookie-parser';
 
 const app: Application = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: ["https://task-management-self-nine.vercel.app", "http://localhost:3000", "http://localhost:5173"],
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
+  })
+);
+
 app.use(cookieParser());
 
 //parser
