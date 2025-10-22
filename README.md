@@ -246,8 +246,3 @@ This project is licensed under the ISC License.
 - Email: mdmazharulislam.dev@gmail.com
 - Phone: +8801911396142
 - Location: Mymensingh, Dhaka, Bangladesh
-
-## 🙏 Acknowledgements
-
-- Thanks to all contributors who have helped build this project
-- Inspired by modern task management applications like Trello and Asana
