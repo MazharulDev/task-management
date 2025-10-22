@@ -1,0 +1,65 @@
+# Dependencies
+node_modules/
+
+# Logs
+logs/
+*.log
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build outputs
+dist/
+build/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Database
+*.sqlite
+*.sqlite3
+
+# Temporary files
+tmp/
+temp/
+
+# Coverage
+coverage/
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Output files
+*.out
+*.exe
+
+# Certificate files
+*.pem
+*.crt
+*.key
+
+# Vercel
+.vercel/
+
+# Netlify
+.netlify/
