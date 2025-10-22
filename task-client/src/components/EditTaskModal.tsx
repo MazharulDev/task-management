@@ -34,7 +34,8 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
         unlockTask(task.id, user.id);
       }
     };
-  }, [user, task.id, lockTask, unlockTask]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array - only run on mount/unmount
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

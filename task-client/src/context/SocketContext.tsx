@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 import type { Task, TaskLock } from '../lib/types';
 
@@ -55,35 +55,35 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, []);
 
-  const lockTask = (taskId: string, userId: string, userName: string) => {
+  const lockTask = useCallback((taskId: string, userId: string, userName: string) => {
     if (socket) {
       socket.emit('lock-task', { taskId, userId, userName });
     }
-  };
+  }, [socket]);
 
-  const unlockTask = (taskId: string, userId: string) => {
+  const unlockTask = useCallback((taskId: string, userId: string) => {
     if (socket) {
       socket.emit('unlock-task', { taskId, userId });
     }
-  };
+  }, [socket]);
 
-  const notifyTaskCreated = (task: Task) => {
+  const notifyTaskCreated = useCallback((task: Task) => {
     if (socket) {
       socket.emit('task-created', task);
     }
-  };
+  }, [socket]);
 
-  const notifyTaskUpdated = (task: Task) => {
+  const notifyTaskUpdated = useCallback((task: Task) => {
     if (socket) {
       socket.emit('task-updated', task);
     }
-  };
+  }, [socket]);
 
-  const notifyTaskDeleted = (taskId: string) => {
+  const notifyTaskDeleted = useCallback((taskId: string) => {
     if (socket) {
       socket.emit('task-deleted', taskId);
     }
-  };
+  }, [socket]);
 
   return (
     <SocketContext.Provider

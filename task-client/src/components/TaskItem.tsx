@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import type { Task } from '../lib/types';
@@ -16,8 +16,12 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onTaskUpdated }) => {
   const { user, isAuthenticated } = useAuth();
   const { locks, notifyTaskDeleted } = useSocket();
 
-  const lock = locks.get(task.id);
-  const isLockedByOther = lock && lock.userId !== user?.id;
+  // Memoize lock state to prevent blinking
+  const lock = useMemo(() => locks.get(task.id), [locks, task.id]);
+  const isLockedByOther = useMemo(
+    () => lock && lock.userId !== user?.id,
+    [lock, user?.id]
+  );
 
   const handleDelete = async () => {
     if (!window.confirm('Are you sure you want to delete this task?')) {
@@ -118,4 +122,4 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onTaskUpdated }) => {
   );
 };
 
-export default TaskItem;
+export default React.memo(TaskItem);
