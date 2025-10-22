@@ -4,6 +4,7 @@ import { useSocket } from '../context/SocketContext';
 import type { Task } from '../lib/types';
 import api from '../lib/api';
 import EditTaskModal from './EditTaskModal';
+import ConfirmModal from './ConfirmModal';
 
 interface TaskItemProps {
   task: Task;
@@ -13,6 +14,8 @@ interface TaskItemProps {
 const TaskItem: React.FC<TaskItemProps> = ({ task, onTaskUpdated }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
   const { user, isAuthenticated } = useAuth();
   const { locks, notifyTaskDeleted } = useSocket();
 
@@ -24,18 +27,24 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onTaskUpdated }) => {
   );
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this task?')) {
-      return;
-    }
-
     setIsDeleting(true);
+    setDeleteError('');
     try {
       await api.delete(`/tasks/${task.id}`);
       notifyTaskDeleted(task.id);
       onTaskUpdated();
+      setShowDeleteConfirm(false);
     } catch (error) {
       console.error('Error deleting task:', error);
-      alert('Failed to delete task');
+      // Type assertion for Axios error
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { data?: { message?: string } } };
+        const errorMessage = axiosError.response?.data?.message || 'Failed to delete task';
+        setDeleteError(errorMessage);
+      } else {
+        setDeleteError('Failed to delete task');
+      }
+      // Don't close the modal if there's an error
     } finally {
       setIsDeleting(false);
     }
@@ -94,16 +103,17 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onTaskUpdated }) => {
               Edit
             </button>
             <button
-              onClick={handleDelete}
-              disabled={isDeleting}
+              onClick={() => setShowDeleteConfirm(true)}
+              disabled={isDeleting || isLockedByOther}
               style={{
                 padding: '6px 12px',
-                backgroundColor: '#dc3545',
+                backgroundColor: isLockedByOther ? '#ccc' : '#dc3545',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
-                cursor: isDeleting ? 'not-allowed' : 'pointer',
+                cursor: (isDeleting || isLockedByOther) ? 'not-allowed' : 'pointer',
               }}
+              title={isLockedByOther ? `Locked by ${lock?.userName}` : 'Delete task'}
             >
               {isDeleting ? 'Deleting...' : 'Delete'}
             </button>
@@ -117,6 +127,33 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onTaskUpdated }) => {
           onClose={() => setShowEditModal(false)}
           onTaskUpdated={onTaskUpdated}
         />
+      )}
+
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        onClose={() => {
+          setShowDeleteConfirm(false);
+          setDeleteError('');
+        }}
+        onConfirm={handleDelete}
+        title="Confirm Delete"
+        message={`Are you sure you want to delete the task "${task.title}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        isDeleting={isDeleting}
+      />
+
+      {deleteError && (
+        <div style={{
+          marginTop: '10px',
+          padding: '10px',
+          backgroundColor: '#f8d7da',
+          color: '#721c24',
+          borderRadius: '4px',
+          border: '1px solid #f5c6cb'
+        }}>
+          {deleteError}
+        </div>
       )}
     </div>
   );

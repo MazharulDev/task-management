@@ -3,6 +3,9 @@ import httpStatus from 'http-status';
 import ApiError from '../../../errors/ApiError';
 import prisma from '../../../shared/prisma';
 import { ICreateTask, IUpdateTask } from './task.interface';
+import { taskLocks } from '../../../socket';
+
+// Import the task locks from socket.ts
 
 const createTask = async (
   userId: string,
@@ -106,7 +109,7 @@ const updateTask = async (
   return result;
 };
 
-const deleteTask = async (id: string): Promise<Task> => {
+const deleteTask = async (id: string, userId?: string): Promise<Task> => {
   const isExist = await prisma.task.findUnique({
     where: {
       id,
@@ -115,6 +118,15 @@ const deleteTask = async (id: string): Promise<Task> => {
 
   if (!isExist) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Task not found');
+  }
+
+  // Check if task is currently locked by another user
+  const lock = taskLocks.get(id);
+  if (lock && lock.userId !== userId) {
+    throw new ApiError(
+      httpStatus.LOCKED,
+      `Task is currently being edited by ${lock.userName}`
+    );
   }
 
   const result = await prisma.task.delete({

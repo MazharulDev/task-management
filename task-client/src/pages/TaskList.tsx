@@ -61,7 +61,18 @@ const TaskList: React.FC = () => {
   };
 
   if (loading) {
-    return <div style={{ padding: '20px' }}>Loading...</div>;
+    return (
+      <div style={{
+        padding: '20px',
+        textAlign: 'center',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh'
+      }}>
+        <div>Loading tasks...</div>
+      </div>
+    );
   }
 
   return (
@@ -71,56 +82,74 @@ const TaskList: React.FC = () => {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: '20px',
+          marginBottom: '30px',
+          padding: '20px',
+          backgroundColor: '#f8f9fa',
+          borderRadius: '8px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
         }}
       >
-        <h1>Task Manager</h1>
+        <div>
+          <h1 style={{ margin: 0, color: '#333' }}>Task Manager</h1>
+          <p style={{ margin: '5px 0 0 0', color: '#666' }}>
+            Manage your tasks efficiently
+          </p>
+        </div>
         <div>
           {isAuthenticated ? (
-            <>
-              <span style={{ marginRight: '15px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+              <div style={{
+                backgroundColor: '#007bff',
+                color: 'white',
+                padding: '8px 16px',
+                borderRadius: '20px',
+                fontSize: '14px'
+              }}>
                 Welcome, {user?.name}!
-              </span>
+              </div>
               <button
                 onClick={() => setShowCreateModal(true)}
                 style={{
-                  padding: '8px 16px',
+                  padding: '10px 20px',
                   backgroundColor: '#007bff',
                   color: 'white',
                   border: 'none',
                   borderRadius: '4px',
-                  marginRight: '10px',
                   cursor: 'pointer',
+                  fontWeight: '500',
+                  fontSize: '14px'
                 }}
               >
-                Create Task
+                + Create Task
               </button>
               <button
                 onClick={handleLogout}
                 style={{
-                  padding: '8px 16px',
+                  padding: '10px 20px',
                   backgroundColor: '#dc3545',
                   color: 'white',
                   border: 'none',
                   borderRadius: '4px',
                   cursor: 'pointer',
+                  fontWeight: '500',
+                  fontSize: '14px'
                 }}
               >
                 Logout
               </button>
-            </>
+            </div>
           ) : (
-            <>
+            <div style={{ display: 'flex', gap: '10px' }}>
               <button
                 onClick={() => navigate('/login')}
                 style={{
-                  padding: '8px 16px',
+                  padding: '10px 20px',
                   backgroundColor: '#007bff',
                   color: 'white',
                   border: 'none',
                   borderRadius: '4px',
-                  marginRight: '10px',
                   cursor: 'pointer',
+                  fontWeight: '500'
                 }}
               >
                 Login
@@ -128,25 +157,60 @@ const TaskList: React.FC = () => {
               <button
                 onClick={() => navigate('/register')}
                 style={{
-                  padding: '8px 16px',
+                  padding: '10px 20px',
                   backgroundColor: '#28a745',
                   color: 'white',
                   border: 'none',
                   borderRadius: '4px',
                   cursor: 'pointer',
+                  fontWeight: '500'
                 }}
               >
                 Register
               </button>
-            </>
+            </div>
           )}
         </div>
       </div>
 
-      {tasks.length === 0 ? (
-        <p style={{ textAlign: 'center', color: '#666' }}>
-          No tasks yet. {isAuthenticated && 'Create one to get started!'}
+      <div style={{ marginBottom: '20px' }}>
+        <h2 style={{ color: '#333' }}>Your Tasks</h2>
+        <p style={{ color: '#666', marginTop: '5px' }}>
+          {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'} found
         </p>
+      </div>
+
+      {tasks.length === 0 ? (
+        <div style={{
+          textAlign: 'center',
+          padding: '40px',
+          backgroundColor: '#f8f9fa',
+          borderRadius: '8px',
+          border: '1px dashed #ddd'
+        }}>
+          <h3 style={{ color: '#666', marginBottom: '10px' }}>No tasks yet</h3>
+          <p style={{ color: '#888', marginBottom: '20px' }}>
+            {isAuthenticated
+              ? 'Create your first task to get started!'
+              : 'Login to create and manage tasks.'}
+          </p>
+          {isAuthenticated && (
+            <button
+              onClick={() => setShowCreateModal(true)}
+              style={{
+                padding: '10px 20px',
+                backgroundColor: '#007bff',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontWeight: '500'
+              }}
+            >
+              Create Your First Task
+            </button>
+          )}
+        </div>
       ) : (
         <div>
           {tasks.map((task) => (

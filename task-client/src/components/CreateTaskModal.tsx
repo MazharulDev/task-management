@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import api from '../lib/api';
+import type { Task } from '../lib/types';
 
 interface CreateTaskModalProps {
   onClose: () => void;
   onTaskCreated: () => void;
+}
+
+// Define the response structure
+interface CreateTaskResponse {
+  statusCode: number;
+  success: boolean;
+  message: string;
+  data: Task;
 }
 
 const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
@@ -24,17 +32,18 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
     setLoading(true);
 
     try {
-      const response = await api.post('/tasks', {
+      const response = await api.post<CreateTaskResponse>('/tasks', {
         title,
         body,
       });
 
-      const newTask = (response.data as any).data;
+      const newTask = response.data.data;
       notifyTaskCreated(newTask);
       onTaskCreated();
       onClose();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create task');
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Failed to create task');
     } finally {
       setLoading(false);
     }
@@ -70,10 +79,10 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
         {error && (
           <div
             style={{
-              color: 'red',
-              marginBottom: '10px',
+              color: 'white',
+              marginBottom: '15px',
               padding: '10px',
-              backgroundColor: '#fee',
+              backgroundColor: '#dc3545',
               borderRadius: '4px',
             }}
           >
@@ -81,10 +90,10 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
           </div>
         )}
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '15px' }}>
+          <div style={{ marginBottom: '20px' }}>
             <label
               htmlFor="title"
-              style={{ display: 'block', marginBottom: '5px' }}
+              style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}
             >
               Title
             </label>
@@ -94,15 +103,23 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
-              style={{ width: '100%', padding: '8px' }}
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                fontSize: '16px',
+                boxSizing: 'border-box'
+              }}
+              placeholder="Enter task title"
             />
           </div>
-          <div style={{ marginBottom: '15px' }}>
+          <div style={{ marginBottom: '20px' }}>
             <label
               htmlFor="body"
-              style={{ display: 'block', marginBottom: '5px' }}
+              style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}
             >
-              Body
+              Description
             </label>
             <textarea
               id="body"
@@ -110,7 +127,15 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
               onChange={(e) => setBody(e.target.value)}
               required
               rows={5}
-              style={{ width: '100%', padding: '8px' }}
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                fontSize: '16px',
+                boxSizing: 'border-box'
+              }}
+              placeholder="Enter task description"
             />
           </div>
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
@@ -118,12 +143,13 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
               type="button"
               onClick={onClose}
               style={{
-                padding: '8px 16px',
+                padding: '10px 20px',
                 backgroundColor: '#6c757d',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
                 cursor: 'pointer',
+                fontWeight: '500'
               }}
             >
               Cancel
@@ -132,12 +158,13 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
               type="submit"
               disabled={loading}
               style={{
-                padding: '8px 16px',
+                padding: '10px 20px',
                 backgroundColor: '#28a745',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
                 cursor: loading ? 'not-allowed' : 'pointer',
+                fontWeight: '500'
               }}
             >
               {loading ? 'Creating...' : 'Create Task'}

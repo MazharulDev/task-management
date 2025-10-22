@@ -2,7 +2,7 @@ import { Server as SocketIOServer, Socket } from 'socket.io';
 import { logger } from './shared/logger';
 
 // Store task locks: { taskId: { userId, userName, socketId } }
-const taskLocks = new Map<
+export const taskLocks = new Map<
   string,
   { userId: string; userName: string; socketId: string }
 >();

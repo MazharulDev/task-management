@@ -10,6 +10,11 @@ interface EditTaskModalProps {
   onTaskUpdated: () => void;
 }
 
+// Define the response structure
+interface ApiResponse {
+  data: Task;
+}
+
 const EditTaskModal: React.FC<EditTaskModalProps> = ({
   task,
   onClose,
@@ -51,21 +56,26 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
     }
 
     try {
-      const response = await api.patch(`/tasks/${task.id}`, {
+      const response = await api.patch<ApiResponse>(`/tasks/${task.id}`, {
         title,
         body,
       });
 
-      const updatedTask = (response.data as any).data;
+      const updatedTask = response.data.data;
       notifyTaskUpdated(updatedTask);
       onTaskUpdated();
       onClose();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to update task');
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Failed to update task');
     } finally {
       setLoading(false);
     }
   };
+
+  // Check if task is locked by another user
+  const lock = locks.get(task.id);
+  const isLockedByOther = lock && lock.userId !== user?.id;
 
   return (
     <div
@@ -94,6 +104,19 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         <h2>Edit Task</h2>
+        {isLockedByOther && (
+          <div
+            style={{
+              color: 'white',
+              marginBottom: '15px',
+              padding: '10px',
+              backgroundColor: '#dc3545',
+              borderRadius: '4px',
+            }}
+          >
+            🔒 This task is currently being edited by {lock?.userName}
+          </div>
+        )}
         {error && (
           <div
             style={{
@@ -121,7 +144,14 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
-              style={{ width: '100%', padding: '8px' }}
+              disabled={isLockedByOther}
+              style={{
+                width: '100%',
+                padding: '8px',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                backgroundColor: isLockedByOther ? '#f8f9fa' : 'white'
+              }}
             />
           </div>
           <div style={{ marginBottom: '15px' }}>
@@ -136,8 +166,15 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
               value={body}
               onChange={(e) => setBody(e.target.value)}
               required
+              disabled={isLockedByOther}
               rows={5}
-              style={{ width: '100%', padding: '8px' }}
+              style={{
+                width: '100%',
+                padding: '8px',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                backgroundColor: isLockedByOther ? '#f8f9fa' : 'white'
+              }}
             />
           </div>
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
@@ -157,14 +194,14 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || isLockedByOther}
               style={{
                 padding: '8px 16px',
-                backgroundColor: '#007bff',
+                backgroundColor: isLockedByOther ? '#ccc' : '#007bff',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
-                cursor: loading ? 'not-allowed' : 'pointer',
+                cursor: (loading || isLockedByOther) ? 'not-allowed' : 'pointer',
               }}
             >
               {loading ? 'Saving...' : 'Save Changes'}
