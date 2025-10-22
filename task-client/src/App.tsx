@@ -5,7 +5,6 @@ import { SocketProvider } from './context/SocketContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import TaskList from './pages/TaskList';
-import './App.css';
 
 function App() {
   return (
