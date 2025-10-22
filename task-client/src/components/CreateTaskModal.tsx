@@ -79,20 +79,27 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: 1000,
+        padding: '20px',
+        boxSizing: 'border-box'
       }}
       onClick={onClose}
     >
       <div
         style={{
           backgroundColor: 'white',
-          padding: '30px',
+          padding: '20px',
           borderRadius: '8px',
           maxWidth: '500px',
           width: '100%',
+          maxHeight: '90vh',
+          overflowY: 'auto'
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2>Create New Task</h2>
+        <h2 style={{
+          marginTop: 0,
+          fontSize: '1.5rem'
+        }}>Create New Task</h2>
         {error && (
           <div
             style={{
@@ -110,7 +117,12 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
           <div style={{ marginBottom: '20px' }}>
             <label
               htmlFor="title"
-              style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}
+              style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontWeight: '500',
+                fontSize: '0.9rem'
+              }}
             >
               Title
             </label>
@@ -134,7 +146,12 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
           <div style={{ marginBottom: '20px' }}>
             <label
               htmlFor="body"
-              style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}
+              style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontWeight: '500',
+                fontSize: '0.9rem'
+              }}
             >
               Description
             </label>
@@ -155,7 +172,12 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
               placeholder="Enter task description"
             />
           </div>
-          <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+          <div style={{
+            display: 'flex',
+            gap: '10px',
+            justifyContent: 'flex-end',
+            flexWrap: 'wrap'
+          }}>
             <button
               type="button"
               onClick={onClose}
@@ -166,7 +188,9 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
                 border: 'none',
                 borderRadius: '4px',
                 cursor: 'pointer',
-                fontWeight: '500'
+                fontWeight: '500',
+                flex: '1',
+                minWidth: '100px'
               }}
             >
               Cancel
@@ -181,7 +205,9 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
                 border: 'none',
                 borderRadius: '4px',
                 cursor: loading ? 'not-allowed' : 'pointer',
-                fontWeight: '500'
+                fontWeight: '500',
+                flex: '1',
+                minWidth: '100px'
               }}
             >
               {loading ? 'Creating...' : 'Create Task'}

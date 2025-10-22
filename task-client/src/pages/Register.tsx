@@ -2,6 +2,17 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+// Define the error structure
+interface AxiosError {
+  response?: {
+    data?: {
+      message?: string;
+      errorMessages?: { message?: string }[];
+    };
+  };
+  message?: string;
+}
+
 const Register: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -20,7 +31,7 @@ const Register: React.FC = () => {
       await register(name, email, password);
       navigate('/');
     } catch (err) {
-      const axiosError = err as any;
+      const axiosError = err as AxiosError;
       const message =
         axiosError.response?.data?.errorMessages?.[0]?.message ||
         axiosError.response?.data?.message ||
@@ -36,14 +47,21 @@ const Register: React.FC = () => {
   return (
     <div style={{
       maxWidth: '400px',
-      margin: '50px auto',
+      margin: '20px auto',
       padding: '20px',
       border: '1px solid #ddd',
       borderRadius: '8px',
       boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-      backgroundColor: 'white'
+      backgroundColor: 'white',
+      width: '90%',
+      boxSizing: 'border-box'
     }}>
-      <h2 style={{ textAlign: 'center', color: '#333', marginBottom: '30px' }}>Create Account</h2>
+      <h2 style={{
+        textAlign: 'center',
+        color: '#333',
+        marginBottom: '30px',
+        fontSize: '1.5rem'
+      }}>Create Account</h2>
       {error && (
         <div style={{
           color: 'white',
@@ -58,7 +76,12 @@ const Register: React.FC = () => {
       )}
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '20px' }}>
-          <label htmlFor="name" style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
+          <label htmlFor="name" style={{
+            display: 'block',
+            marginBottom: '8px',
+            fontWeight: '500',
+            fontSize: '0.9rem'
+          }}>
             Full Name
           </label>
           <input
@@ -79,7 +102,12 @@ const Register: React.FC = () => {
           />
         </div>
         <div style={{ marginBottom: '20px' }}>
-          <label htmlFor="email" style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
+          <label htmlFor="email" style={{
+            display: 'block',
+            marginBottom: '8px',
+            fontWeight: '500',
+            fontSize: '0.9rem'
+          }}>
             Email Address
           </label>
           <input
@@ -100,7 +128,12 @@ const Register: React.FC = () => {
           />
         </div>
         <div style={{ marginBottom: '20px' }}>
-          <label htmlFor="password" style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
+          <label htmlFor="password" style={{
+            display: 'block',
+            marginBottom: '8px',
+            fontWeight: '500',
+            fontSize: '0.9rem'
+          }}>
             Password
           </label>
           <input
@@ -139,9 +172,16 @@ const Register: React.FC = () => {
           {loading ? 'Creating Account...' : 'Register'}
         </button>
       </form>
-      <p style={{ marginTop: '20px', textAlign: 'center' }}>
+      <p style={{
+        marginTop: '20px',
+        textAlign: 'center',
+        fontSize: '0.9rem'
+      }}>
         Already have an account?{' '}
-        <Link to="/login" style={{ color: '#007bff', textDecoration: 'none' }}>
+        <Link to="/login" style={{
+          color: '#007bff',
+          textDecoration: 'none'
+        }}>
           Sign in here
         </Link>
       </p>

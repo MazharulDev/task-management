@@ -107,20 +107,27 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: 1000,
+        padding: '20px',
+        boxSizing: 'border-box'
       }}
       onClick={onClose}
     >
       <div
         style={{
           backgroundColor: 'white',
-          padding: '30px',
+          padding: '20px',
           borderRadius: '8px',
           maxWidth: '500px',
           width: '100%',
+          maxHeight: '90vh',
+          overflowY: 'auto'
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2>Edit Task</h2>
+        <h2 style={{
+          marginTop: 0,
+          fontSize: '1.5rem'
+        }}>Edit Task</h2>
         {isLockedByOther && (
           <div
             style={{
@@ -151,7 +158,11 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
           <div style={{ marginBottom: '15px' }}>
             <label
               htmlFor="title"
-              style={{ display: 'block', marginBottom: '5px' }}
+              style={{
+                display: 'block',
+                marginBottom: '5px',
+                fontSize: '0.9rem'
+              }}
             >
               Title
             </label>
@@ -174,7 +185,11 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
           <div style={{ marginBottom: '15px' }}>
             <label
               htmlFor="body"
-              style={{ display: 'block', marginBottom: '5px' }}
+              style={{
+                display: 'block',
+                marginBottom: '5px',
+                fontSize: '0.9rem'
+              }}
             >
               Body
             </label>
@@ -194,7 +209,12 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
               }}
             />
           </div>
-          <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+          <div style={{
+            display: 'flex',
+            gap: '10px',
+            justifyContent: 'flex-end',
+            flexWrap: 'wrap'
+          }}>
             <button
               type="button"
               onClick={onClose}
@@ -205,6 +225,8 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                 border: 'none',
                 borderRadius: '4px',
                 cursor: 'pointer',
+                flex: '1',
+                minWidth: '100px'
               }}
             >
               Cancel
@@ -219,6 +241,8 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                 border: 'none',
                 borderRadius: '4px',
                 cursor: (loading || isLockedByOther) ? 'not-allowed' : 'pointer',
+                flex: '1',
+                minWidth: '100px'
               }}
             >
               {loading ? 'Saving...' : 'Save Changes'}

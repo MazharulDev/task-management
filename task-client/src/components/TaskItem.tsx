@@ -75,12 +75,25 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onTaskUpdated }) => {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'start',
+          flexDirection: 'column',
+          gap: '15px'
         }}
       >
-        <div style={{ flex: 1 }}>
-          <h3 style={{ margin: '0 0 10px 0' }}>{task.title}</h3>
-          <p style={{ margin: '0 0 10px 0', color: '#555' }}>{task.body}</p>
-          <div style={{ fontSize: '12px', color: '#888' }}>
+        <div style={{ flex: 1, width: '100%' }}>
+          <h3 style={{
+            margin: '0 0 10px 0',
+            fontSize: '1.1rem'
+          }}>{task.title}</h3>
+          <p style={{
+            margin: '0 0 10px 0',
+            color: '#555',
+            fontSize: '0.9rem'
+          }}>{task.body}</p>
+          <div style={{
+            fontSize: '0.8rem',
+            color: '#888',
+            marginTop: '10px'
+          }}>
             {task.editor && (
               <div>Last edited by: {task.editor.name}</div>
             )}
@@ -88,7 +101,11 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onTaskUpdated }) => {
               Updated: {new Date(task.updatedAt).toLocaleString()}
             </div>
             {lock && (
-              <div style={{ color: '#dc3545', fontWeight: 'bold' }}>
+              <div style={{
+                color: '#dc3545',
+                fontWeight: 'bold',
+                marginTop: '5px'
+              }}>
                 🔒 Currently being edited by {lock.userName}
               </div>
             )}
@@ -96,17 +113,25 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onTaskUpdated }) => {
         </div>
 
         {isAuthenticated && (
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <div style={{
+            display: 'flex',
+            gap: '10px',
+            width: '100%',
+            justifyContent: 'flex-end'
+          }}>
             <button
               onClick={() => setShowEditModal(true)}
               disabled={isLockedByOther}
               style={{
-                padding: '6px 12px',
+                padding: '8px 16px',
                 backgroundColor: isLockedByOther ? '#ccc' : '#ffc107',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
                 cursor: isLockedByOther ? 'not-allowed' : 'pointer',
+                fontSize: '0.9rem',
+                flex: '1',
+                maxWidth: '100px'
               }}
               title={isLockedByOther ? `Locked by ${lock?.userName}` : 'Edit task'}
             >
@@ -116,12 +141,15 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onTaskUpdated }) => {
               onClick={() => setShowDeleteConfirm(true)}
               disabled={isDeleting || isLockedByOther}
               style={{
-                padding: '6px 12px',
+                padding: '8px 16px',
                 backgroundColor: isLockedByOther ? '#ccc' : '#dc3545',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
                 cursor: (isDeleting || isLockedByOther) ? 'not-allowed' : 'pointer',
+                fontSize: '0.9rem',
+                flex: '1',
+                maxWidth: '100px'
               }}
               title={isLockedByOther ? `Locked by ${lock?.userName}` : 'Delete task'}
             >

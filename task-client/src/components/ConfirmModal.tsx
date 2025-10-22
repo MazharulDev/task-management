@@ -36,22 +36,35 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
                 justifyContent: 'center',
                 alignItems: 'center',
                 zIndex: 1000,
+                padding: '20px',
+                boxSizing: 'border-box'
             }}
             onClick={onClose}
         >
             <div
                 style={{
                     backgroundColor: 'white',
-                    padding: '30px',
+                    padding: '20px',
                     borderRadius: '8px',
                     maxWidth: '500px',
                     width: '100%',
                 }}
                 onClick={(e) => e.stopPropagation()}
             >
-                <h2 style={{ marginTop: 0 }}>{title}</h2>
-                <p>{message}</p>
-                <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                <h2 style={{
+                    marginTop: 0,
+                    fontSize: '1.5rem'
+                }}>{title}</h2>
+                <p style={{
+                    fontSize: '0.9rem',
+                    lineHeight: '1.5'
+                }}>{message}</p>
+                <div style={{
+                    display: 'flex',
+                    gap: '10px',
+                    justifyContent: 'flex-end',
+                    flexWrap: 'wrap'
+                }}>
                     <button
                         type="button"
                         onClick={onClose}
@@ -62,6 +75,8 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
                             border: 'none',
                             borderRadius: '4px',
                             cursor: 'pointer',
+                            flex: '1',
+                            minWidth: '100px'
                         }}
                         disabled={isDeleting}
                     >
@@ -78,6 +93,8 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
                             border: 'none',
                             borderRadius: '4px',
                             cursor: isDeleting ? 'not-allowed' : 'pointer',
+                            flex: '1',
+                            minWidth: '100px'
                         }}
                     >
                         {isDeleting ? 'Deleting...' : confirmText}
